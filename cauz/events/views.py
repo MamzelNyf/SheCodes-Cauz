@@ -1,11 +1,15 @@
 from django.http import Http404
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Event, Pledge
 from.serializers import EventSerializer, PledgeSerializer, DetailEventSerializer
+from .permissions import IsOwnerOrReadOnly
 
 class EventList(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+        ]
 
     def get(self, request):
         events = Event.objects.all()
@@ -26,6 +30,10 @@ class EventList(APIView):
         )
 
 class EventDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly]
+        
     def get_object(self, pk):
         try:
             return Event.objects.get(pk=pk)
@@ -36,6 +44,17 @@ class EventDetail(APIView):
         event = self.get_object(pk)
         serializer = DetailEventSerializer(event)
         return Response(serializer.data)
+
+    def put(self, request, pk):
+        event = self.get_object(pk)
+        data = request
+        serializer = DetailEventSerializer(
+            instance = event,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
 
 class PledgeList(APIView):
 
