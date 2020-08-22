@@ -3,13 +3,11 @@ from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Event, Pledge
-from.serializers import EventSerializer, PledgeSerializer, DetailEventSerializer
+from.serializers import EventSerializer, PledgeSerializer, EventDetailSerializer, PledgeDetailSerializer
 from .permissions import IsOwnerOrReadOnly
 
 class EventList(APIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
-        ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get(self, request):
         events = Event.objects.all()
@@ -33,7 +31,7 @@ class EventDetail(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
         IsOwnerOrReadOnly]
-        
+
     def get_object(self, pk):
         try:
             return Event.objects.get(pk=pk)
@@ -42,22 +40,35 @@ class EventDetail(APIView):
 
     def get(self, request, pk):
         event = self.get_object(pk)
-        serializer = DetailEventSerializer(event)
+        serializer = EventDetailSerializer(event)
         return Response(serializer.data)
 
     def put(self, request, pk):
         event = self.get_object(pk)
-        data = request
-        serializer = DetailEventSerializer(
+        serializer = EventDetailSerializer(
             instance = event,
-            data=data,
+            data=request.data,
             partial=True
         )
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=request.user)
+            return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+            event = self.get_object(pk)
+            event.delete()
+            return Response(status=status.HTTP_200_OK)
 
 class PledgeList(APIView):
-
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
     def get(self, request):
         pledges = Pledge.objects.all()
         serializer = PledgeSerializer(pledges, many=True)
@@ -66,7 +77,7 @@ class PledgeList(APIView):
     def post(self,request):
         serializer = PledgeSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(supporter=request.user)
             return Response(
             serializer.data,
             status=status.HTTP_201_CREATED
@@ -77,10 +88,14 @@ class PledgeList(APIView):
         )
 
 class PledgeDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Pledge.objects.get(pk=pk)
-        except Event.DoesNotExist:
+        except Pledge.DoesNotExist:
             raise Http404
 
     def get(self, request, pk):
@@ -88,3 +103,25 @@ class PledgeDetail(APIView):
         serializer = PledgeSerializer(pledge)
         return Response(serializer.data)
 
+    def put(self, request, pk):
+        pledge = self.get_object(pk)
+        serializer = PledgeDetailSerializer(
+            instance = pledge,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, pk):
+            pledge = self.get_object(pk)
+            pledge.delete()
+            return Response(status=status.HTTP_200_OK)
