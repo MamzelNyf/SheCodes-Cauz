@@ -3,7 +3,7 @@ from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Event, Pledge
-from.serializers import EventSerializer, PledgeSerializer, EventDetailSerializer, PledgeDetailSerializer
+from.serializers import EventSerializer, PledgeSerializer, EventDetailSerializer
 from .permissions import IsOwnerOrReadOnly
 
 class EventList(APIView):
@@ -105,7 +105,7 @@ class PledgeDetail(APIView):
 
     def put(self, request, pk):
         pledge = self.get_object(pk)
-        serializer = PledgeDetailSerializer(
+        serializer = PledgeSerializer(
             instance = pledge,
             data=request.data,
             partial=True
