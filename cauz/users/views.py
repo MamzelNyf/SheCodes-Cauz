@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import CustomUser
 from.serializers import CustomUserSerializer
-from events.permissions import IsOwnerOrReadOnly
+from .permissions import IsUserOrReadOnly
 
 
 class CustomUserList(APIView):
@@ -16,6 +16,7 @@ class CustomUserList(APIView):
 
     def post(self,request):
         serializer = CustomUserSerializer(data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -30,10 +31,11 @@ class CustomUserList(APIView):
 class CustomUserDetail(APIView): 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly]
+        IsUserOrReadOnly]
 
     def get_object(self, pk):
         try:
+            self.check_object_permissions(self.request, CustomUser)
             return CustomUser.objects.get(pk=pk)
         except CustomUser.DoesNotExist:
             raise Http404
