@@ -34,8 +34,9 @@ class EventDetail(APIView):
 
     def get_object(self, slug):
         try:
-            self.check_object_permissions(self.request, Event)
-            return Event.objects.get(slug=slug)
+            event = Event.objects.get(slug=slug)
+            self.check_object_permissions(self.request, event)
+            return event
         except Event.DoesNotExist:
             raise Http404
 
@@ -96,8 +97,9 @@ class PledgeDetail(APIView):
 
     def get_object(self, pk):
         try:
-            self.check_object_permissions(self.request, Pledge)
-            return Pledge.objects.get(pk=pk)
+            pledge = Pledge.objects.get(pk=pk)
+            self.check_object_permissions(self.request, pledge)
+            return pledge
         except Pledge.DoesNotExist:
             raise Http404
 

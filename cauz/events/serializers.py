@@ -22,6 +22,7 @@ class EventSerializer(serializers.Serializer):
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source='owner.id')
     category = serializers.ReadOnlyField(source='Category', default='Charity')
+    region = serializers.ReadOnlyField(source='Region', default='World')
 
     def create(self, validated_data):
         return Event.objects.create(**validated_data)
