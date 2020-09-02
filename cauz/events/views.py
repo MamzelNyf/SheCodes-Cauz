@@ -250,6 +250,6 @@ class RegionDetail(APIView):
         )
 
     def delete(self, request, slug):
-            region = self.get_object(slug)
-            region.delete()
-            return Response(status=status.HTTP_200_OK)
+        region = self.get_object(slug)
+        region.delete()
+        return Response(status=status.HTTP_200_OK)
