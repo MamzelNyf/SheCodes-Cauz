@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='pledge',
             name='supporter',
-            field=models.ForeignKey(default='anonymous', null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='supporter_pledges', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='supporter_pledges', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='event',
