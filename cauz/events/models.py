@@ -71,5 +71,5 @@ class Pledge(models.Model):
         on_delete=models.SET_DEFAULT,
         related_name='supporter_pledges',
         null=True,
-        default='anonymous'
+        default=None
     )
