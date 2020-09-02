@@ -14,7 +14,7 @@ from rest_framework.generics import ListAPIView
 class EventList(ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = EventSerializer
-    filter_backends = (filters.OrderingFilter)
+    filter_backends = (filters.OrderingFilter, )
     ordering_fields = ['date_created']
 
     def get_queryset(self):
@@ -163,12 +163,13 @@ class CategoryList(APIView):
         )
 
 class CategoryDetail(APIView):
-    permission_classes = [         permissions.IsAuthenticatedOrReadOnly,
-permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,permissions.IsAdminUser]
 
     def get_object(self, slug):
         try:
-            return Category.objects.get(slug=slug)
+            category = Category.objects.get(slug=slug)
+            self.check_object_permissions(self.request, category)
+            return category
         except Category.DoesNotExist:
             raise Http404
 
