@@ -1,18 +1,28 @@
 from django.http import Http404
-from rest_framework import status, permissions
+from rest_framework import status, permissions, filters,generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Event, Pledge, Category
-from.serializers import EventSerializer, PledgeSerializer, EventDetailSerializer, CategorySerializer
-from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly
+from .models import Event, Pledge, Category, Region
+from .serializers import EventSerializer, PledgeSerializer, EventDetailSerializer, CategorySerializer, RegionSerializer
+from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly, IsSuperUserOrReadOnly
+from rest_framework.generics import ListAPIView
 
-class EventList(APIView):
+
+
+
+
+class EventList(ListAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = EventSerializer
+    filter_backends = (filters.OrderingFilter)
+    ordering_fields = ['date_created']
 
-    def get(self, request):
-        events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        queryset = Event.objects.all()
+        category = self.request.query_params.get('category__name', None)
+        if category is not None:
+            queryset = queryset.filter(category=category)
+        return queryset
 
     def post(self,request):
         serializer = EventSerializer(data=request.data)
@@ -132,12 +142,13 @@ class PledgeDetail(APIView):
             return Response(status=status.HTTP_200_OK)
 
 class CategoryList(APIView):
-    
+    permission_classes = [ permissions.IsAuthenticatedOrReadOnly]
     def get(self, request):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
+    
     def post(self,request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
@@ -152,13 +163,93 @@ class CategoryList(APIView):
         )
 
 class CategoryDetail(APIView):
+    permission_classes = [         permissions.IsAuthenticatedOrReadOnly,
+permissions.IsAdminUser]
+
     def get_object(self, slug):
         try:
             return Category.objects.get(slug=slug)
-        except Pledge.DoesNotExist:
+        except Category.DoesNotExist:
             raise Http404
 
     def get(self, request, slug):
         category = self.get_object(slug)
         serializer = CategorySerializer(category)
         return Response(serializer.data)
+
+    def put(self, request, slug):
+        category = self.get_object(slug)
+        serializer = CategorySerializer(
+            instance = category,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, slug):
+            category = self.get_object(slug)
+            category.delete()
+            return Response(status=status.HTTP_200_OK)
+
+class RegionList(APIView):
+    # permission_classes = [ IsSuperUserOrReadOnly]
+    
+    def get(self, request):
+        regions = Region.objects.all()
+        serializer = RegionSerializer(regions, many=True)
+        return Response(serializer.data)
+
+    def post(self,request):
+        serializer = RegionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+class RegionDetail(APIView):
+    def get_object(self, slug):
+        try:
+            return Region.objects.get(slug=slug)
+        except Region.DoesNotExist:
+            raise Http404
+
+    def get(self, request, slug):
+        region = self.get_object(slug)
+        serializer = RegionSerializer(region)
+        return Response(serializer.data)
+
+    def put(self, request, slug):
+        region = self.get_object(slug)
+        serializer = RegionSerializer(
+            instance = region,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def delete(self, request, slug):
+            region = self.get_object(slug)
+            region.delete()
+            return Response(status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Profile
 from django.contrib.auth.hashers import make_password
 
 
@@ -11,6 +11,8 @@ class CustomUserSerializer(serializers.Serializer):
         write_only=True,
         required=True,
     )
+    profile= serializers.ReadOnlyField(source='Profile')
+
 
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data.get('password'))

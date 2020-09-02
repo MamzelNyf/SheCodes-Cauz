@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Event, Pledge, Category
+from .models import Event, Pledge, Category, Region
+
 
 
 class CategorySerializer(serializers.Serializer):
@@ -9,6 +10,26 @@ class CategorySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.slug = validated_data.get('slug', instance.slug)
+        instance.save()
+        return instance
+
+class RegionSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    name = serializers.CharField(max_length=200)
+    slug = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        return Region.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.slug = validated_data.get('slug', instance.slug)
+        instance.save()
+        return instance
 
 class EventSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
