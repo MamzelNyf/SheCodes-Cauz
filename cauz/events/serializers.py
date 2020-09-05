@@ -53,7 +53,6 @@ class PledgeSerializer(serializers.Serializer):
     amount = serializers.IntegerField()
     comment = serializers.CharField(max_length=200)
     anonymous = serializers.BooleanField()
-    # supporter = serializers.CharField(max_length=200)
     supporter = serializers.ReadOnlyField(source='supporter.id')
     event = serializers.PrimaryKeyRelatedField(source='event.id',queryset=Event.objects.all())
 
@@ -64,6 +63,7 @@ class PledgeSerializer(serializers.Serializer):
         return Pledge.objects.create(
             event=validated_data['event']['id'],
             amount=validated_data['amount'],
+            comment = validated_data['comment'],
             anonymous=validated_data['anonymous'],
             supporter=validated_data['supporter']
         ) 
