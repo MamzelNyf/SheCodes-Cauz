@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Event, Pledge, Category, Region
 from .serializers import EventSerializer, PledgeSerializer, EventDetailSerializer, CategorySerializer, RegionSerializer
-from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly, IsSuperUserOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsSupporterOrReadOnly
 from rest_framework.generics import ListAPIView
 
 
