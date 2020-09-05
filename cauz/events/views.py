@@ -201,8 +201,8 @@ class CategoryDetail(APIView):
             return Response(status=status.HTTP_200_OK)
 
 class RegionList(APIView):
-    # permission_classes = [ IsSuperUserOrReadOnly]
-    
+    permission_classes = [ permissions.IsAuthenticatedOrReadOnly]
+
     def get(self, request):
         regions = Region.objects.all()
         serializer = RegionSerializer(regions, many=True)
@@ -222,9 +222,13 @@ class RegionList(APIView):
         )
 
 class RegionDetail(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,permissions.IsAdminUser]
+
     def get_object(self, slug):
         try:
-            return Region.objects.get(slug=slug)
+            region = Region.objects.get(slug=slug)
+            self.check_object_permissions(self.request, region)
+            return region
         except Region.DoesNotExist:
             raise Http404
 
