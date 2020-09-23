@@ -43,8 +43,11 @@ class EventSerializer(serializers.Serializer):
     slug = serializers.CharField(required=False)
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source="owner.id")
-    category = serializers.ReadOnlyField(source="Category", default="Charity")
-    region = serializers.ReadOnlyField(source="Region", default="World")
+    # category = serializers.ReadOnlyField(source="Category", default="Charity")
+    category = serializers.SlugRelatedField('name', queryset=Category.objects.all())
+    # region = serializers.ReadOnlyField(source="Region", default="World")
+    region = serializers.SlugRelatedField('name', queryset=Region.objects.all())
+
 
     def create(self, validated_data):
         return Event.objects.create(**validated_data)
@@ -96,5 +99,7 @@ class EventDetailSerializer(EventSerializer):
         )
         instance.owner = validated_data.get("owner", instance.owner)
         instance.category = validated_data.get("category", instance.category)
+        instance.region = validated_data.get("region", instance.region)
+
         instance.save()
         return instance
