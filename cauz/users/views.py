@@ -67,3 +67,12 @@ class CustomUserDetail(APIView):
             user = self.get_object(pk)
             user.delete()
             return Response(status=status.HTTP_200_OK)
+
+
+class MeView(APIView): 
+    def get(self, request):
+        user = request.user
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data)
+
+    
