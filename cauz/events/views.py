@@ -47,7 +47,6 @@ class EventDetail(APIView):
             raise Http404
 
     def get(self, request, slug):
-
         event = self.get_object(slug)
         print(event)
         serializer = EventDetailSerializer(event)
@@ -133,10 +132,11 @@ class CategoryList(APIView):
 
 
 class CategoryDetail(APIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        permissions.IsAdminUser,
-    ]
+    # permission_classes = [
+    #     permissions.IsAuthenticatedOrReadOnly,
+    #     permissions.IsAdminUser,
+    # ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self, slug):
         try:
@@ -183,10 +183,12 @@ class RegionList(APIView):
 
 
 class RegionDetail(APIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        permissions.IsAdminUser,
-    ]
+    # permission_classes = [
+    #     permissions.IsAuthenticatedOrReadOnly,
+    #     permissions.IsAdminUser,
+    # ]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
     def get_object(self, slug):
         try:
