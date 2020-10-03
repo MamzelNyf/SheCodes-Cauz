@@ -8,6 +8,9 @@ from .permissions import IsUserOrReadOnly
 
 
 class CustomUserList(APIView):
+    permission_classes = [
+        permissions.AllowAny
+    ]
 
     def get(self, request):
         users = CustomUser.objects.all()
