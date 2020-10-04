@@ -2,6 +2,8 @@
 
 This app is a project for SheCodes Program Plus 2020.
 
+Deployed on: https://shecodes-cauz.herokuapp.com/
+
 Goal: Create a crowfunding website.
 
 Technologies used:
