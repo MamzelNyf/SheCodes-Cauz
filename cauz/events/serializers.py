@@ -56,9 +56,9 @@ class EventSerializer(serializers.Serializer):
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     amount = serializers.IntegerField()
-    comment = serializers.CharField(max_length=200)
+    comment = serializers.CharField(max_length=200, required=False)
     anonymous = serializers.BooleanField()
-    supporter = serializers.ReadOnlyField(source="supporter.id")
+    supporter = serializers.ReadOnlyField(source="supporter.username")
     event = serializers.PrimaryKeyRelatedField(
         source="event.id", queryset=Event.objects.all()
     )
