@@ -42,7 +42,7 @@ class EventSerializer(serializers.Serializer):
     date_created = serializers.DateTimeField()
     slug = serializers.CharField(required=False)
     # owner = serializers.CharField(max_length=200)
-    owner = serializers.ReadOnlyField(source="owner.id")
+    owner = serializers.ReadOnlyField(source="owner.username")
     # category = serializers.ReadOnlyField(source="Category", default="Charity")
     category = serializers.SlugRelatedField('name', queryset=Category.objects.all())
     # region = serializers.ReadOnlyField(source="Region", default="World")
