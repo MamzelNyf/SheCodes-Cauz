@@ -5,7 +5,7 @@ from .models import Event, Pledge, Category, Region
 class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     name = serializers.CharField(max_length=32)
-    slug = serializers.CharField(required=False)
+    slug = serializers.ReadOnlyField(required=False)
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)
@@ -56,7 +56,7 @@ class EventSerializer(serializers.Serializer):
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     amount = serializers.IntegerField()
-    comment = serializers.CharField(max_length=200, required=False)
+    comment = serializers.CharField(max_length=200, allow_blank=True)
     anonymous = serializers.BooleanField()
     supporter = serializers.ReadOnlyField(source="supporter.username")
     event = serializers.PrimaryKeyRelatedField(
